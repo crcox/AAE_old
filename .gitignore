@@ -1,0 +1,6 @@
+**/*.doc
+**/*.docx
+**/*.pyc
+*.doc
+*.docx
+*.pyc
