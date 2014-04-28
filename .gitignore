@@ -1,6 +1,10 @@
 **/*.doc
 **/*.docx
 **/*.pyc
+**/*.pkl
 *.doc
 *.docx
 *.pyc
+*.pkl
+3kdict_with_aae
+change_log
