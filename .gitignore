@@ -2,9 +2,11 @@
 **/*.docx
 **/*.pyc
 **/*.pkl
+**/*.swp
 *.doc
 *.docx
 *.pyc
 *.pkl
+*.swp
 3kdict_with_aae
 change_log

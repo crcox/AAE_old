@@ -6,9 +6,10 @@ with open(argv[1],'rb') as f:
 
 print ''
 print 'SUMMARY OF CHANGES'
-for i in range(4):
-	rule='rule%d' % (i+1)
-	print 'Rule %d (total:% 4d)' % (i+1,logdict[rule]['total'])
+rules=['devoice','reduction_cc','reduction_pv']
+for i in range(3):
+	rule=rules[i]
+	print '%s (total:% 4d)' % (rule,logdict[rule]['total'])
 	stdout.write(' +'+'-'*41+'+\n')
 	stdout.write(' |')
 	j=-1

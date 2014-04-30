@@ -10,7 +10,7 @@ fricatives = ['T','D','C','S','Z']
 devoicing_rules = {
 	'b':'p',
 	'd':'t',
-	'g':'k',
+#	'g':'k',
 	'v':'f',
 	'z':'s'
 	}
@@ -25,7 +25,7 @@ def count_dashes(s):
 			dashes[ind]+=1
 		else:
 			ind=1 # so the next dash encountered will increment the second
-			      # counter.
+				  # counter.
 	return tuple(dashes)
 
 def parse_vowels(s):
@@ -41,96 +41,67 @@ with open('3kdict.pkl','rb') as f:
 
 with open('change_log','w') as log:
 	logdict = {
-			'rule1':{'total':0},
-			'rule2':{'total':0},
-			'rule3':{'total':0},
-			'rule4':{'total':0},
-			'rule5':{'total':0}
-	}
+			'devoice':{'total':0},
+			'reduction_cc':{'total':0},
+			'reduction_pv':{'total':0}
+	        }
 	for w in d.keys():
 		p=d[w]['phon']
 		dashes=count_dashes(p)
 		p=p.strip('_')
 		pp=parse_vowels(p)
 		p=list(p)
-		rule_applied = [False,False,False,False,False]
-		# REPLACEMENTS
-		# Rule 1: If the pronunciation ends with a th sound (either T or D, in our
-		# scheme) replace with f.
-		if p[-1] in th:
-			rulecode=p[0]+'-->f'
-			log.write(w+": "+''.join(p)+"-->")
-			p[-1] = 'f'
-			logdict['rule1']['total']+=1
-			try:
-				logdict['rule1'][rulecode]+=1
-			except KeyError:
-				logdict['rule1'][rulecode]=1
-			log.write(''.join(p)+"\n")
-			rule_applied[0] = True
-
-		# Rule 2: If the pronunciation begins with a th sound replace with /d/.
-		if p[0] in th:
-			rulecode=p[0]+'-->d'
-			log.write(w+": "+''.join(p)+"-->")
-			p[0] = 'd'
-			logdict['rule2']['total']+=1
-			try:
-				logdict['rule2'][rulecode]+=1
-			except KeyError:
-				logdict['rule2'][rulecode]=1
-			log.write(''.join(p)+"\n")
-			rule_applied[1] = True
-
-		# Rule 3: Final phonemes /b/, /d/, /g/, /v/, or /z/ replaced with /p/, /t/,
-		# /k/, /f/, and /s/, respectively.
+		rule_applied = [False,False,False]
+		# DEVOICING
+		# Rule 1: Final phonemes /b/, /d/, /v/, or /z/ replaced with /p/, /t/,
+		# /f/, and /s/, respectively.
 		if p[-1] in devoicing_rules.keys():
 			rulecode=p[-1]+'-->'+devoicing_rules[p[-1]]
 			log.write(w+": "+''.join(p)+"-->")
 			p[-1] = devoicing_rules[p[-1]]
-			logdict['rule3']['total']+=1
+			logdict['devoice']['total']+=1
 			try:
-				logdict['rule3'][rulecode]+=1
+				logdict['devoice'][rulecode]+=1
 			except KeyError:
-				logdict['rule3'][rulecode]=1
+				logdict['devoice'][rulecode]=1
 
 			log.write(''.join(p)+"\n")
-			rule_applied[2] = True
+			rule_applied[0] = True
 
-		# REDUCTIONS
-		# Rule 4: If a word ends with a consonant cluster, and the cluster ends
-		# with /t/ or /d/, drop the /t/ or /d/
+		# Consonant Cluster Reduction
+		# Rule 2: If a word ends with a consonant cluster, and the cluster ends
+		# with /t/ /d/ /s/ or /z/, drop it.
 		try:
-			if p[-2] in consonants and p[-1] in ['t','d']:
+			if p[-2] in consonants and p[-1] in ['t','d','s','z']:
 				rulecode=p[-1]+'_drop'
 				log.write(w+": "+''.join(p)+"-->")
 				p=p[0:-1]
-				logdict['rule4']['total']+=1
+				logdict['reduction_cc']['total']+=1
 				try:
-					logdict['rule4'][rulecode]+=1
+					logdict['reduction_cc'][rulecode]+=1
 				except KeyError:
-					logdict['rule4'][rulecode]=1
+					logdict['reduction_cc'][rulecode]=1
 				log.write(''.join(p)+"\n")
-				rule_applied[3] = True
+				rule_applied[1] = True
 		except IndexError:
 			pass
 
-	#	Rule 5: If the pronunciation ends with a vowel followed by a consonant,
-	#	drop the last phoneme.
-	#	try:
-	#		if pp[-2] in vowels and pp[-1] in ['t','d']:
-	#			rulecode=p[-1]+'_drop'
-	#			log.write(w+": "+''.join(p)+"-->")
-	#			p=p[0:-1]
-	#			logdict['rule5']['total']+=1
-	#			try:
-	#				logdict['rule5'][rulecode]+=1
-	#			except KeyError:
-	#				logdict['rule5'][rulecode]=1
-	#			log.write(''.join(p)+"\n")
-	#			rule_applied[4] = True
-	#	except IndexError:
-	#		pass
+		# Post-vocalic Reduction
+		# Rule 3: If a word ends with a vowel followed by an /r/, drop the /r/.
+		try:
+			if p[-2] in vowels and p[-1] == 'r':
+				rulecode=p[-1]+'_drop'
+				log.write(w+": "+''.join(p)+"-->")
+				p=p[0:-1]
+				logdict['reduction_pv']['total']+=1
+				try:
+					logdict['reduction_pv'][rulecode]+=1
+				except KeyError:
+					logdict['reduction_pv'][rulecode]=1
+				log.write(''.join(p)+"\n")
+				rule_applied[2] = True
+		except IndexError:
+			pass
 
 		# Compose and record new phonology
 		d[w]['AAE_phon']='_'*dashes[0] + ''.join(p) + '_'*dashes[1]
@@ -161,9 +132,10 @@ print 'Wrote text file 3kdict_with_aae'
 
 print ''
 print 'SUMMARY OF CHANGES'
-for i in range(4):
-	rule='rule%d' % (i+1)
-	print 'Rule %d (total:% 4d)' % (i+1,logdict[rule]['total'])
+rules=['devoice','reduction_cc','reduction_pv']
+for i in range(3):
+	rule=rules[i]
+	print '%s (total:% 4d)' % (rule,logdict[rule]['total'])
 	stdout.write(' +'+'-'*41+'+\n')
 	stdout.write(' |')
 	j=-1
