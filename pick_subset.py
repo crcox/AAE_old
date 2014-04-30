@@ -1,7 +1,9 @@
 import pickle,random
 from sys import argv,stdout
+import tkFileDialog
 
-with open(argv[1],'rb') as f:
+filename = tkFileDialog.askopenfilename()
+with open(filename,'rb') as f:
 	D = pickle.load(f)
 
 aae_phon = []

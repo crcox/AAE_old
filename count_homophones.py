@@ -1,16 +1,18 @@
 import pickle,random
 from sys import argv,stdout
+import tkFileDialog
 
-with open(argv[1],'rb') as f:
-        D = pickle.load(f)
+filename = tkFileDialog.askopenfilename()
+with open(filename,'rb') as f:
+	D = pickle.load(f)
 
 aae_phon = []
 sae_phon = []
 changes  = []
 for w,d in D.items():
-    aae_phon.append(d['AAE_phon'])
-    sae_phon.append(d['phon'])
-    changes.append(d['rule_applied'])
+	aae_phon.append(d['AAE_phon'])
+	sae_phon.append(d['phon'])
+	changes.append(d['rule_applied'])
 
 n = len(aae_phon)
 aae_u = len(set(aae_phon))
