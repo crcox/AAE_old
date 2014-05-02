@@ -2,7 +2,11 @@ import pickle,random
 from sys import argv,stdout
 import tkFileDialog
 
-filename = tkFileDialog.askopenfilename()
+try:
+	filename=argv[1]
+except IndexError:
+	filename = tkFileDialog.askopenfilename()
+
 with open(filename,'rb') as f:
 	D = pickle.load(f)
 
@@ -11,7 +15,7 @@ sae_phon = []
 changes  = []
 for w,d in D.items():
 	aae_phon.append(d['AAE_phon'])
-	sae_phon.append(d['phon'])
+	sae_phon.append(d['SAE_phon'])
 	changes.append(d['rule_applied'])
 
 n = len(aae_phon)

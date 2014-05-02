@@ -1,7 +1,7 @@
 import pickle
 from sys import stdout
 # DEFINITIONS
-vowels = ['c','a','@','&','E','e','I','i','O','o','U','u','^','w']
+vowels = ['A','a','@','&','c','E','e','I','i','O','o','U','u','^','W','w','Y']
 consonants = ['d','F','f','G','g','H','h','J','j','K','k',
 			'L','l','M','m','N','n','P','p','Q','q','R','r',
 			's','t','V','v','x','z']
@@ -32,21 +32,23 @@ def parse_vowels(s):
 # Some values are represented by multiple characters. For ease of processing,
 # these will be reduced to arbitrary 1-character codes:
 # ar --> &
-	s=s.replace('ar','&')
+#	s=s.replace('ar','&')
 	return s
 
 # Load desired dictionary.
 with open('3kdict.pkl','rb') as f:
-	d=pickle.load(f)
+	D=pickle.load(f)
 
+print ''
+print 'Applying rules...'
 with open('change_log','w') as log:
 	logdict = {
 			'devoice':{'total':0},
 			'reduction_cc':{'total':0},
 			'reduction_pv':{'total':0}
 	        }
-	for w in d.keys():
-		p=d[w]['phon']
+	for w in D.keys():
+		p=D[w]['SAE_phon']
 		dashes=count_dashes(p)
 		p=p.strip('_')
 		pp=parse_vowels(p)
@@ -78,7 +80,7 @@ with open('change_log','w') as log:
 			if pp[-2] in consonants and p[-1] in ['t','d','s','z']:
 				rulecode=p[-1]+'_drop'
 				log.write(w+": "+''.join(p)+"-->")
-				p=p[0:-1]
+				p[-1]='_'
 				logdict['reduction_cc']['total']+=1
 				try:
 					logdict['reduction_cc'][rulecode]+=1
@@ -95,7 +97,7 @@ with open('change_log','w') as log:
 			if pp[-2] in vowels and p[-1] == 'r':
 				rulecode=p[-1]+'_drop'
 				log.write(w+": "+''.join(p)+"-->")
-				p=p[0:-1]
+				p[-1]='_'
 				logdict['reduction_pv']['total']+=1
 				try:
 					logdict['reduction_pv'][rulecode]+=1
@@ -107,11 +109,35 @@ with open('change_log','w') as log:
 			pass
 
 		# Compose and record new phonology
-		d[w]['AAE_phon']='_'*dashes[0] + ''.join(p) + '_'*dashes[1]
-		d[w]['rule_applied']=tuple(rule_applied)
+		D[w]['AAE_phon']='_'*dashes[0] + ''.join(p) + '_'*dashes[1]
+		D[w]['rule_applied']=tuple(rule_applied)
+
+
+print ''
+print 'Identifying homophones...'
+
+words = []
+aae_phon = []
+sae_phon = []
+for w,d in D.items():
+	words.append(w)
+	aae_phon.append(d['AAE_phon'])
+	sae_phon.append(d['SAE_phon'])
+
+for (W,A,S) in zip(words,aae_phon,sae_phon):
+	sh = [w for (w,s) in zip(words,sae_phon) if s==S and not w==W]
+	ah = [w for (w,a) in zip(words,aae_phon) if a==A and not w==W]
+	D[W]['SAE_homo'] = sh
+	D[W]['AAE_homo'] = ah
+#	if len(sh) > 0:
+#		print W
+#		print sh
+#		print ah
+
+print 'DONE.'
 
 with open('3kdict_with_aae.pkl','wb') as f:
-	pickle.dump(d,f)
+	pickle.dump(D,f)
 print 'Wrote binary file 3kdict_with_aae.pkl'
 
 with open('3kdict_change_log.pkl','wb') as f:
@@ -119,15 +145,15 @@ with open('3kdict_change_log.pkl','wb') as f:
 print 'Wrote binary file 3kdict_change_log.pkl'
 
 with open('3kdict_with_aae','w') as f:
-	for key in d.keys():
+	for key in D.keys():
 		s = ' '.join(
 				[
 					key,
-					d[key]['orth'],
-					d[key]['phon'],
-					d[key]['AAE_phon'],
-					str(d[key]['freq']),
-					''.join([str(int(r)) for r in d[key]['rule_applied']])
+					D[key]['orth'],
+					D[key]['SAE_phon'],
+					D[key]['AAE_phon'],
+					str(D[key]['freq']),
+					''.join([str(int(r)) for r in D[key]['rule_applied']])
 				]
 			)
 		f.write(s+'\n')

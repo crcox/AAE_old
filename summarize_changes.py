@@ -2,7 +2,11 @@ import pickle
 from sys import argv,stdout
 import tkFileDialog
 
-filename = tkFileDialog.askopenfilename()
+try:
+	filename = argv[1]
+except IndexError:
+	filename = tkFileDialog.askopenfilename()
+
 with open(filename,'rb') as f:
 	logdict = pickle.load(f)
 

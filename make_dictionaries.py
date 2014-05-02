@@ -9,9 +9,9 @@ def parse_to_dict(filename):
 		for line in f:
 			x = line.strip().split()
 			try:
-				d[x[0]] = {'orth':x[1],'phon':x[2],'freq':int(x[3])}
+				d[x[0]] = {'orth':x[1],'SAE_phon':x[2],'freq':int(x[3])}
 			except ValueError:
-				d[x[0]] = {'orth':x[1],'phon':x[2],'freq':int(float(x[3]))}
+				d[x[0]] = {'orth':x[1],'SAE_phon':x[2],'freq':int(float(x[3]))}
 	return d
 
 d = parse_to_dict('3kdict')
