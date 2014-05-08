@@ -1,8 +1,5 @@
-import pickle,random
-from sys import argv,stdout
+import argparse, pickle, random
 import tkFileDialog
-
-import argparse
 
 parser = argparse.ArgumentParser(
 	description='Pick a subset of N words, subject to certain conditions.'
