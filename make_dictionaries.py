@@ -1,30 +1,43 @@
-import pickle
+import argparse, pickle, os
+import DictClasses
+
+parser = argparse.ArgumentParser(
+	description='Pick a subset of N words, subject to certain conditions.'
+)
+parser.add_argument('-w',
+	metavar='WordToPhon',
+	dest='WordToPhon',
+	type=str, 
+	nargs='+',
+	default=False,
+	help='Path to a text file that maps between a word and its orth, phon, and freq data. File is assumed to be white-space delimited.'
+)
+parser.add_argument('-p', 
+	metavar="PhonToPattern",
+	dest="PhonToPattern",
+	type=str,
+	nargs='+',
+	default=False,
+	help='Path to a text file that maps between phon symbols and their binary patterns (for training the network in Lens. File is assumed to be white-space delimited.'
+)
+
 # This script will take the text files and create python dictionaries. These
 # dictionaries will be referenced rather than the text files themselves in all
 # python scrips. This script should be re-run any times the files 3kdict or
 # 6kdict are changed.
-def parse_to_dict(filename):
-	d={}
-	with open(filename,'r') as f:
-		for line in f:
-			x = line.strip().split()
-			try:
-				d[x[0]] = {'orth':x[1],'SAE_phon':x[2],'freq':int(x[3])}
-			except ValueError:
-				d[x[0]] = {'orth':x[1],'SAE_phon':x[2],'freq':int(float(x[3]))}
-	return d
 
-d = parse_to_dict('3kdict')
-print ''
-print 'Parsed text file 3kdict...'
-with open('3kdict.pkl','wb') as f:
-	pickle.dump(d,f)
-print 'Wrote binary file 3kdict.pkl.'
+for p in args.WordToPhon:
+	D = DictClasses.WordToPhon(p);
+	print ''
+	D.parse()
+	print 'Parsed text file %s...' % D.textpath
+	D.save()
+	print 'Wrote binary file %s.' % D.dictpath
 
-d = parse_to_dict('6kdict')
-print ''
-print 'Parsed text file 6kdict...'
-with open('6kdict.pkl','wb') as f:
-	pickle.dump(d,f)
-print 'Wrote binary file 6kdict.pkl.'
-print ''
+for p in args.PhonToPattern:
+	D = DictClasses.PhonToPatten(p);
+	print ''
+	D.parse()
+	print 'Parsed text file %s...' % D.textpath
+	D.save()
+	print 'Wrote binary file %s.' % D.dictpath
