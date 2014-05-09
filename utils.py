@@ -163,15 +163,17 @@ class LensEx:
 		self.example['events'] = E
 
 	def initEvents(self):
-
-		e = {}
-		e['i'] = {}
-		e['t'] = {}
-		e['i']['null'] = ''
-		e['i']['active'] = ''
-		e['t']['null'] = ''
-		e['t']['active'] = ''
-		E = [dict(e) for i in range(self.example['nEvents'])]
+		E = []
+		for i in range(self.example['nEvents']):
+			e = {}
+			e['i'] = {}
+			e['t'] = {}
+			e['i']['null'] = ''
+			e['i']['active'] = ''
+			e['t']['null'] = ''
+			e['t']['active'] = ''
+			E.append(e)
+		
 		return(E)
 
 	def close(self):
