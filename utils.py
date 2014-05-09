@@ -1,4 +1,4 @@
-import os, Tkinter
+import math, os, Tkinter
 
 def count_dashes(s):
 # Orth and Phon patterns are _ padded. They need to be tracked before they are
@@ -88,11 +88,16 @@ class LensEx:
 		self.itype = itype.lower()
 		self.ttype = ttype.lower()
 		self.lang = lang.upper()
-
+		
 		self.parseExample()
+		
+		try:
+			logfreq = math.log(self.example['freq'])
+		except ValueError:
+			logfreq = 0
 
 		self.h.write('name: %s\n' % self.example['name'])
-		self.h.write('freq: %s\n' % self.example['freq'])
+		self.h.write('freq: %.4f\n' % logfreq)
 		self.h.write('%d\n' % self.example['nEvents'])
 		for i,event in enumerate(self.example['events']):
 			self.h.write('[%d] ' % i)

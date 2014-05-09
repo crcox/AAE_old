@@ -50,9 +50,11 @@ with open(args.pmap,'rb') as f:
 fileparts = os.path.splitext(args.dictionary)
 filename = fileparts[0] + '.ex'
 header = {'defI': 0, 'defT': 0, 'actI': 1, 'actT': 1, 'min': 2, 'max': 2, 'grace': 0}
+words = D.keys()
+words.sort()
 with open(filename,'w') as f:
 	Ex = LensEx(D,M,f)
 	Ex.writeHeader(header)
 
-	for word,data in D.items():
+	for word in words:
 		Ex.writeExample(word,itype='Phon',ttype='Phon',lang='AAE')
