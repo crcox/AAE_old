@@ -1,4 +1,4 @@
-import argparse, pickle, os
+import argparse, pickle, os, tkFileDialog
 import DictClasses
 
 parser = argparse.ArgumentParser(
@@ -20,6 +20,16 @@ parser.add_argument('-p',
 	default=False,
 	help='Path to a text file that maps between phon symbols and their binary patterns (for training the network in Lens. File is assumed to be white-space delimited.'
 )
+args = parser.parse_args()
+
+if ~args.WordToPhon:
+    print "Select a (or several) WordToPhon text files..."
+    args.WordToPhon = tkFileDialog.askopenfilenames()
+
+
+if ~args.PhonToPattern:
+    print "Select a (or several) PhonToPattern text files..."
+    args.PhonToPattern = tkFileDialog.askopenfilenames()
 
 # This script will take the text files and create python dictionaries. These
 # dictionaries will be referenced rather than the text files themselves in all
@@ -35,7 +45,7 @@ for p in args.WordToPhon:
 	print 'Wrote binary file %s.' % D.dictpath
 
 for p in args.PhonToPattern:
-	D = DictClasses.PhonToPatten(p);
+	D = DictClasses.PhonToPattern(p);
 	print ''
 	D.parse()
 	print 'Parsed text file %s...' % D.textpath
