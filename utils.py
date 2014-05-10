@@ -65,6 +65,75 @@ def guiGetConstraints(args):
 	root.mainloop()
 	return(args)
 
+def guiGetHeaderInfo(args):
+	root = Tkinter.Tk()
+	def getValuesAndClose():
+		args.min = int(min_entry.get())
+		args.max = int(max_entry.get())
+		args.defI = int(defI_entry.get())
+		args.defT = int(defT_entry.get())
+		args.actI = int(actI_entry.get())
+		args.actT = int(actT_entry.get())
+		args.grace = int(grace_entry.get())
+		root.destroy()
+
+	def getValuesAndClose_bind(event):
+		args.min = int(min_entry.get())
+		args.max = int(max_entry.get())
+		args.defI = int(defI_entry.get())
+		args.defT = int(defT_entry.get())
+		args.actI = int(actI_entry.get())
+		args.actT = int(actT_entry.get())
+		args.grace = int(grace_entry.get())
+		root.destroy()
+
+	root.title("Define header variables")
+	mainframe = Tkinter.Frame(root)
+	mainframe.grid(column=0, row=0, sticky=('n','w','e','s'))
+	mainframe.columnconfigure(0, weight=1)
+	mainframe.rowconfigure(0, weight=1)
+
+	minstr = Tkinter.StringVar()
+	maxstr = Tkinter.StringVar()
+	defI = Tkinter.StringVar()
+	defT = Tkinter.StringVar()
+	actI = Tkinter.StringVar()
+	actT = Tkinter.StringVar()
+	grace = Tkinter.StringVar()
+
+	minstr_entry = Tkinter.Entry(mainframe, width=7, textvariable=minstr)
+	minstr_entry.grid(column=2,row=1, sticky=('w','e'))
+	maxstr_entry = Tkinter.Entry(mainframe, width=7, textvariable=maxstr)
+	maxstr_entry.grid(column=2,row=2, sticky=('w','e'))
+	grace_entry = Tkinter.Entry(mainframe, width=7, textvariable=grace)
+	grace_entry.grid(column=2,row=3, sticky=('w','e'))
+	defI_entry = Tkinter.Entry(mainframe, width=7, textvariable=defI)
+	defI_entry.grid(column=4,row=1, sticky=('w','e'))
+	defT_entry = Tkinter.Entry(mainframe, width=7, textvariable=defT)
+	defT_entry.grid(column=4,row=2, sticky=('w','e'))
+	actI_entry = Tkinter.Entry(mainframe, width=7, textvariable=actI)
+	actI_entry.grid(column=4,row=3, sticky=('w','e'))
+	actT_entry = Tkinter.Entry(mainframe, width=7, textvariable=actT)
+	actT_entry.grid(column=4,row=4, sticky=('w','e'))
+
+	Tkinter.Label(mainframe, text="min:").grid(column=1,row=1,sticky='w')
+	Tkinter.Label(mainframe, text="max:").grid(column=1,row=2,sticky='w')
+	Tkinter.Label(mainframe, text="grace:").grid(column=1,row=3,sticky='w')
+	Tkinter.Label(mainframe, text="defI:").grid(column=3,row=1,sticky='w')
+	Tkinter.Label(mainframe, text="defT:").grid(column=3,row=2,sticky='w')
+	Tkinter.Label(mainframe, text="actI:").grid(column=3,row=3,sticky='w')
+	Tkinter.Label(mainframe, text="actT:").grid(column=3,row=4,sticky='w')
+
+	Tkinter.Button(mainframe, text="OK", command=getValuesAndClose).grid(column=4, row=5)
+
+	for child in mainframe.winfo_children():
+		child.grid_configure(padx=5, pady=5)
+	
+	minstr_entry.focus()
+	root.bind('<Return>',getValuesAndClose_bind)
+	root.mainloop()
+	return(args)
+
 class LensEx:
 	def __init__(self,WordToPhon,PhonToPattern,handle):
 		self.D = WordToPhon

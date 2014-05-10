@@ -19,10 +19,59 @@ parser.add_argument('-m',
 	default=False,
 	help='Path to a pickled python dictionary that contains mapping between phonological symbols and binary patterns (output from make_dictionaries.py).'
 )
+parser.add_argument('--max',
+	metavar='max',
+	dest='max',
+	type=int, 
+	default=2,
+	help="ex file header parameter."
+)
+parser.add_argument('--min',
+	metavar='min',
+	dest='min',
+	type=int, 
+	default=2,
+	help="ex file header parameter."
+)
+parser.add_argument('--defI',
+	metavar='defI',
+	dest='defI',
+	type=int, 
+	default=0,
+	help="ex file header parameter."
+)
+parser.add_argument('--defT',
+	metavar='defT',
+	dest='defT',
+	type=int, 
+	default=0,
+	help="ex file header parameter."
+)
+parser.add_argument('--actI',
+	metavar='actI',
+	dest='actI',
+	type=int, 
+	default=1,
+	help="ex file header parameter."
+)
+parser.add_argument('--actT',
+	metavar='actT',
+	dest='actT',
+	type=int, 
+	default=1,
+	help="ex file header parameter."
+)
+parser.add_argument('--grace',
+	metavar='grace',
+	dest='grace',
+	type=int, 
+	default=0,
+	help="ex file header parameter."
+)
 args = parser.parse_args()
 
 if args.dictionary==False:
-#	args = utils.guiGetConstraints(args)
+	args = guiGetHeaderInfo(args)
 	print "Select a pickled WordToPhon dictionary with AAE phonology..."
 	args.dictionary = tkFileDialog.askopenfilename()
 
@@ -49,7 +98,8 @@ with open(args.pmap,'rb') as f:
 
 fileparts = os.path.splitext(args.dictionary)
 filename = fileparts[0] + '.ex'
-header = {'defI': 0, 'defT': 0, 'actI': 1, 'actT': 1, 'min': 2, 'max': 2, 'grace': 0}
+
+header = {k: vars(args)[k] for k in ['defI','defT','actI','actT','min','max','grace']}
 words = D.keys()
 words.sort()
 with open(filename,'w') as f:
