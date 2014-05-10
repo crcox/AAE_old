@@ -5,8 +5,8 @@ parser = argparse.ArgumentParser(
 		description='Generate AAE phonology by applying a set of rules.',
 		epilog='The current set of rules were agreed upon by CRC, CL, MSS and MCM. See archived email, subject:"phon. decisions for AAE model", date: April 29, 2014.'
 )
-parser.add_argument('-i',
-	metavar='dictionary', 
+parser.add_argument('-w',
+	metavar='WordToPhon', 
 	dest='dictionary', 
 	type=str, 
 	nargs=1,

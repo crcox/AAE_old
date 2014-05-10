@@ -5,15 +5,15 @@ from utils import *
 parser = argparse.ArgumentParser(
 	description='Translate a dictionary for a training sample into Lens .ex.'
 )
-parser.add_argument('-i',
-	metavar='dictionary',
+parser.add_argument('-w',
+	metavar='WordToPhon',
 	dest='dictionary',
 	type=str, 
 	default=False,
 	help='Path to a pickled python dictionary that contains SAE and AAE phonological codes for each word (output from pick_subset.py).'
 )
 parser.add_argument('-m',
-	metavar='pmap',
+	metavar='PhonToPattern',
 	dest='pmap',
 	type=str, 
 	default=False,

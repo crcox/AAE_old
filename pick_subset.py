@@ -6,8 +6,8 @@ parser = argparse.ArgumentParser(
 	description='Pick a subset of N words, subject to certain conditions.',
     epilog='If run without any options, the user will be promted for constraints in a GUI popup, after which the program will ask for a pickled dictionary with AAE phonology.'
 )
-parser.add_argument('-i',
-	metavar='dictionary',
+parser.add_argument('-w',
+	metavar='WordToPhon',
 	dest='dictionary',
 	type=str, 
 	default=False,
