@@ -71,7 +71,8 @@ class LensEx:
 		self.pMap = PhonToPattern
 		self.h = handle
 		self.slen=len(self.D[self.D.keys()[0]]['sem_rep'])
-		self.plen=len(self.pMap[self.pMap.keys()[0]])
+		self.plen=len(self.pMap[self.pMap.keys()[0]])*len(self.D[self.D.keys()[0]]['SAE_phon'])
+		self.fmax = max([self.D[k]['freq'] for k in self.D.keys()])
 		self.UnitRanges = {
 				'all':'*',
 				'phon':'%d-%d' % (0,self.plen),
@@ -92,12 +93,12 @@ class LensEx:
 		self.parseExample()
 		
 		try:
-			logfreq = math.log(self.example['freq'])
+			freq = self.example['freq'] #/self.fmax
 		except ValueError:
-			logfreq = 0
+			freq = 0
 
 		self.h.write('name: %s\n' % self.example['name'])
-		self.h.write('freq: %.4f\n' % logfreq)
+		self.h.write('freq: %.4f\n' % freq)
 		self.h.write('%d\n' % self.example['nEvents'])
 		for i,event in enumerate(self.example['events']):
 			self.h.write('[%d] ' % i)
