@@ -1,4 +1,4 @@
-setwd('~/Documents/AAE/Simple_SP_2014')
+# setwd('~/Documents/AAE/Simple_SP_2014')
 substrRight <- function(x, n){
   substr(x, nchar(x)-n+1, nchar(x))
 }
@@ -11,25 +11,44 @@ substrAllButLast <- function(x, n){
 
 # Load and save activations
 x <- list.files()
-x <- sort(x) # hack to make sure phon preceeds sem
-x <- x[substr(x,1,3) %in% c("AAE","SAE")]
+# x <- sort(x) # hack to make sure phon preceeds sem
+x <- x[substr(x,1,3) %in% c("AAE","SAE") & substrRight(x,3)=="txt"]
+xsplit <- as.data.frame(do.call(rbind,strsplit(x,"_")),stringsAsFactors=FALSE)
+names(xsplit) <- c("lang","cond","nwords","stage","unknown","nepochs","type","subj")
+str(xsplit)
+xsplit$nepochs <- as.numeric(substrAllButLast(xsplit$nepochs,2))
+xsplit$subj <- as.numeric(substrAllButFirst(substrAllButLast(xsplit$subj,4),1))
+str(xsplit)
+ix <- with(xsplit, order(lang,subj,nepochs,type))
+x <- x[ix]
+xsplit <- xsplit[ix,]
 
-temp <- NULL
 colClassesPhon <- c("NULL","character","NULL",rep("numeric",250))
 colClassesSem  <- c("NULL","NULL","NULL",rep("numeric",200))
 
-for (i in seq(1,length(x),by=2)) {
-	fp <- x[i]
-	fs <- x[i+1]
+ff <- subset(x, xsplit$subj==1)
+
+n <- (length(ff)/2) * 500
+Activations <- data.frame(matrix(ncol=458,nrow=n))
+names(Activations)[1:8] <- c("lang","cond","nwords","stage","task","nepochs","subj","word")
+names(Activations)[9:(250+8)] <- paste('p',seq(1:250),sep='')
+names(Activations)[(250+9):458] <- paste('s',seq(1:200),sep='')
+
+for (i in seq(1,length(ff),by=2)) {
+  print(i)
+  a <- ((i-1)*500)+1
+  b <- 500*i
+  
+	fp <- ff[i]
+	fs <- ff[i+1]
 	info <- do.call(c,strsplit(fp,'_'))
-	lang <- info[1]
-	type <- info[2]
-	nwords <- info[3]
-	stage <- as.numeric(substrRight(info[4],1))
-	unknown <- info[5]
-	totalEpochs <- as.numeric(substrAllButLast(info[6],2))
+	Activations$lang[a:b] <- info[1]
+  Activations$cond[a:b] <- info[2]
+  Activations$nwords[a:b] <- info[3]
+  Activations$stage[a:b] <- as.numeric(substrRight(info[4],1))
+  Activations$epoch[a:b] <- as.numeric(substrAllButLast(info[6],2))
 	#outType <- info[7]
-	subj <- as.numeric(substrAllButFirst(substrAllButLast(info[8],4),1))
+  Activations$subj[a:b] <- as.numeric(substrAllButFirst(substrAllButLast(info[8],4),1))
 	
 	temp.phon <- read.delim2(fp,
 		header=FALSE,sep=" ",dec=".",
@@ -37,8 +56,8 @@ for (i in seq(1,length(x),by=2)) {
 	)
 	
 	info.trial <- do.call(rbind,strsplit(temp.phon[,1],split="_"))
-	word <- info.trial[,1]
-	cond <- info.trial[,2]
+	Activations$word[a:b] <- info.trial[,1]
+	Activations$task[a:b] <- info.trial[,2]
 	temp.phon[,1] <- NULL
 	
 	temp.sem <- read.delim2(fs,
@@ -46,17 +65,13 @@ for (i in seq(1,length(x),by=2)) {
 		colClasses=colClassesSem
 	)
 	
-	temp.comb <- cbind(lang,type,nwords,stage,totalEpochs,subj,word,cond,temp.phon,temp.sem)
-	
-	temp <- rbind(temp,temp.comb)
+  Activations[a:b,9:458] <- cbind(temp.phon,temp.sem)
 }
+rm(temp.sem, temp.phon)
+rm(info, info.trial)
+rm(fp, fs)
 
-names(temp)[9:(250+8)] <- paste('p',seq(1:250),sep='')
-names(temp)[(250+9):dim(temp)[2]] <- paste('s',seq(1:200),sep='')
-
-Activations <- temp
-
-save(d,file="Activations.Rdata")
+# save(d,file="Activations.Rdata")
 
 ## Load and save targets
 colClassesPhon <- c("character",rep("numeric",250))
@@ -91,4 +106,4 @@ Targets$lang <- as.factor(Targets$lang)
 
 str(Targets[,1:10])
 
-save(Targets,file='Targets.Rdata')
+# save(Targets,file='Targets.Rdata')
