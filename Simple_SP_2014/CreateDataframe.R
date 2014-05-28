@@ -66,11 +66,15 @@ temp.AAE <- read.delim2("Phon_AAE_target.txt",
 	header=FALSE,sep="\t",dec='.',
 	colClasses=colClassesPhon
 )
+temp.AAE <- cbind("AAE", temp.AAE)
+names(temp.AAE)[1] <- "lang"
 
 temp.SAE <- read.delim2("Phon_SAE_target.txt",
 	header=FALSE,sep="\t",dec='.',
 	colClasses=colClassesPhon
 )
+temp.SAE <- cbind("SAE", temp.SAE)
+names(temp.SAE)[1] <- "lang"
 
 temp.sem <- read.delim2("Sem_SAE_target.txt",
 	header=FALSE,sep="\t",dec='.',
@@ -78,10 +82,12 @@ temp.sem <- read.delim2("Sem_SAE_target.txt",
 )
 
 Targets <- cbind(rbind(temp.AAE,temp.SAE),temp.sem)
-names(Targets)[1] <- 'word'
-names(Targets)[2:(250+1)] <- paste('p',seq(1:250),sep='')
-names(Targets)[(250+2):dim(Targets)[2]] <- paste('s',seq(1:200),sep='')
+names(Targets)[1:2] <- c('lang','word')
+names(Targets)[3:(250+2)] <- paste('p',seq(1:250),sep='')
+names(Targets)[(250+3):dim(Targets)[2]] <- paste('s',seq(1:200),sep='')
 Targets$word <- as.factor(Targets$word)
+Targets$lang <- as.factor(Targets$lang)
+
 
 str(Targets[,1:10])
 
