@@ -5,3 +5,5 @@ with open('3kdict_with_aae.pkl','rb') as f:
 print 'cent'
 print D['cent']['SAE_homo']
 print D['cent']['AAE_homo']
+print D['cent']['sem_rep']
+print D['cent']['freq']

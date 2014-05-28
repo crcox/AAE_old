@@ -1,12 +1,30 @@
-import pickle
-from sys import stdout
-# DEFINITIONS
-vowels = ['A','a','@','&','c','E','e','I','i','O','o','U','u','^','W','w','Y']
-consonants = ['d','F','f','G','g','H','h','J','j','K','k',
-			'L','l','M','m','N','n','P','p','Q','q','R','r',
-			's','t','V','v','x','z']
-th = ['T','D']
-fricatives = ['T','D','C','S','Z']
+import argparse, pickle, sys,tkFileDialog
+import phoncodes, utils
+
+parser = argparse.ArgumentParser(
+		description='Generate AAE phonology by applying a set of rules.',
+		epilog='The current set of rules were agreed upon by CRC, CL, MSS and MCM. See archived email, subject:"phon. decisions for AAE model", date: April 29, 2014.'
+)
+parser.add_argument('-w',
+	metavar='WordToPhon', 
+	dest='dictionary', 
+	type=str, 
+	nargs=1,
+	default=False,
+	help='Path to a pickled python dictionary that contains SAE phonological codes for each word (output from make_dictionaries.py). If not specified, user will be prompted to supply a path.'
+)
+args = parser.parse_args()
+
+# If a dictionary was provided, use that as the filename;
+# otherwise, ask for a filename with a GUI.
+if args.dictionary:
+	filename = args.dictionary[0]
+else:
+	filename = tkFileDialog.askopenfilename()
+
+with open(filename,'rb') as f:
+	D = pickle.load(f)
+
 devoicing_rules = {
 	'b':'p',
 	'd':'t',
@@ -14,30 +32,6 @@ devoicing_rules = {
 	'v':'f',
 	'z':'s'
 	}
-
-def count_dashes(s):
-# Orth and Phon patterns are _ padded. They need to be tracked before they are
-# stripped so they can be re-added to the modified solution.
-	ind=0
-	dashes=[0,0]
-	for c in s:
-		if c=='_':
-			dashes[ind]+=1
-		else:
-			ind=1 # so the next dash encountered will increment the second
-				  # counter.
-	return tuple(dashes)
-
-def parse_vowels(s):
-# Some values are represented by multiple characters. For ease of processing,
-# these will be reduced to arbitrary 1-character codes:
-# ar --> &
-#	s=s.replace('ar','&')
-	return s
-
-# Load desired dictionary.
-with open('3kdict.pkl','rb') as f:
-	D=pickle.load(f)
 
 print ''
 print 'Applying rules...'
@@ -49,16 +43,16 @@ with open('change_log','w') as log:
 	        }
 	for w in D.keys():
 		p=D[w]['SAE_phon']
-		dashes=count_dashes(p)
+		dashes=utils.count_dashes(p)
 		p=p.strip('_')
-		pp=parse_vowels(p)
+		pp=utils.parse_vowels(p)
 		p=list(p)
 		rule_applied = [False,False,False]
 		# DEVOICING
 		# Rule 1: Final phonemes /b/, /d/, /v/, or /z/ replaced with /p/, /t/,
 		# /f/, and /s/, respectively.
 		try:
-			if pp[-2] in vowels and p[-1] in devoicing_rules.keys():
+			if pp[-2] in phoncodes.vowels and p[-1] in devoicing_rules.keys():
 				rulecode=p[-1]+'-->'+devoicing_rules[p[-1]]
 				log.write(w+": "+''.join(p)+"-->")
 				p[-1] = devoicing_rules[p[-1]]
@@ -77,7 +71,7 @@ with open('change_log','w') as log:
 		# Rule 2: If a word ends with a consonant cluster, and the cluster ends
 		# with /t/ /d/ /s/ or /z/, drop it.
 		try:
-			if pp[-2] in consonants and p[-1] in ['t','d','s','z']:
+			if pp[-2] in phoncodes.consonants and p[-1] in ['t','d','s','z']:
 				rulecode=p[-1]+'_drop'
 				log.write(w+": "+''.join(p)+"-->")
 				p[-1]='_'
@@ -94,7 +88,7 @@ with open('change_log','w') as log:
 		# Post-vocalic Reduction
 		# Rule 3: If a word ends with a vowel followed by an /r/, drop the /r/.
 		try:
-			if pp[-2] in vowels and p[-1] == 'r':
+			if pp[-2] in phoncodes.vowels and p[-1] == 'r':
 				rulecode=p[-1]+'_drop'
 				log.write(w+": "+''.join(p)+"-->")
 				p[-1]='_'
@@ -165,19 +159,19 @@ rules=['devoice','reduction_cc','reduction_pv']
 for i in range(3):
 	rule=rules[i]
 	print '%s (total:% 4d)' % (rule,logdict[rule]['total'])
-	stdout.write(' +'+'-'*41+'+\n')
-	stdout.write(' |')
+	sys.stdout.write(' +'+'-'*41+'+\n')
+	sys.stdout.write(' |')
 	j=-1
 	for k in logdict[rule].keys():
 		if k=='total':
 			continue
 		j+=1
-		stdout.write('% 7s:% 4d' % (k,logdict[rule][k]))
+		sys.stdout.write('% 7s:% 4d' % (k,logdict[rule][k]))
 		if (j%3) == 2:
-			stdout.write(' |\n')
-			stdout.write(' |')
+			sys.stdout.write(' |\n')
+			sys.stdout.write(' |')
 		else:
-			stdout.write(' |')
+			sys.stdout.write(' |')
 
-	stdout.write('\n')
-	stdout.write(' +'+'-'*41+'+\n\n')
+	sys.stdout.write('\n')
+	sys.stdout.write(' +'+'-'*41+'+\n\n')
