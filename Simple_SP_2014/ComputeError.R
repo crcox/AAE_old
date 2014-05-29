@@ -1,5 +1,20 @@
-load('Activations.Rdata',verbose=T)
+# load('Activations.Rdata',verbose=T)
 load('Targets.Rdata',verbose=T)
+
+cosd <- function(AA,TT) {
+  unitnorm <- function(x) {
+    s <- apply(x,2,function(x) sqrt(sum(x^2)))
+    S <- matrix(
+      rep(s,500),
+      nrow=500,byrow=TRUE
+    )
+    x[,s!=0] <- x[,s!=0]/S[,s!=0]
+    return(x)
+  }
+  TTun <- unitnorm(TT)
+  AAun <- unitnorm(AA)
+  return(TTun %*% t(AAun))
+}
 
 phon <- rep(FALSE, 450); phon[1:250] <- TRUE
 sem <- rep(FALSE, 450); sem[251:450] <- TRUE
