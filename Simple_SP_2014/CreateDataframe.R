@@ -28,7 +28,7 @@ colClassesSem  <- c("NULL","NULL","NULL",rep("numeric",200))
 
 ff <- subset(x, xsplit$subj==1)
 
-n <- (length(ff)/2) * 500
+n <- (length(ff)/1) * 500
 Activations <- data.frame(matrix(ncol=458,nrow=n))
 names(Activations)[1:8] <- c("lang","cond","nwords","stage","task","nepochs","subj","word")
 names(Activations)[9:(250+8)] <- paste('p',seq(1:250),sep='')
@@ -71,7 +71,7 @@ rm(temp.sem, temp.phon)
 rm(info, info.trial)
 rm(fp, fs)
 
-# save(d,file="Activations.Rdata")
+save(Activations,file="../UntrackedData/ActivationsAllEpochsS1.Rdata")
 
 ## Load and save targets
 colClassesPhon <- c("character",rep("numeric",250))
