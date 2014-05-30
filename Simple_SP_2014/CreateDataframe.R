@@ -28,19 +28,18 @@ colClassesSem  <- c("NULL","NULL","NULL",rep("numeric",200))
 
 ff <- subset(x, xsplit$subj==1)
 
-n <- (length(ff)/1) * 500
+n <- (length(ff)/2) * 500
 Activations <- data.frame(matrix(ncol=458,nrow=n))
-names(Activations)[1:8] <- c("lang","cond","nwords","stage","task","nepochs","subj","word")
+names(Activations)[1:8] <- c("lang","cond","nwords","stage","task","epoch","subj","word")
 names(Activations)[9:(250+8)] <- paste('p',seq(1:250),sep='')
 names(Activations)[(250+9):458] <- paste('s',seq(1:200),sep='')
 
-for (i in seq(1,length(ff),by=2)) {
-  print(i)
+for (i in seq(1,length(ff)/2)) {
   a <- ((i-1)*500)+1
   b <- 500*i
   
-	fp <- ff[i]
-	fs <- ff[i+1]
+	fp <- ff[(i*2)-1]
+	fs <- ff[i*2]
 	info <- do.call(c,strsplit(fp,'_'))
 	Activations$lang[a:b] <- info[1]
   Activations$cond[a:b] <- info[2]
@@ -70,6 +69,12 @@ for (i in seq(1,length(ff),by=2)) {
 rm(temp.sem, temp.phon)
 rm(info, info.trial)
 rm(fp, fs)
+
+Activations$lang <- as.factor(Activations$lang)
+Activations$cond <- as.factor(Activations$cond)
+Activations$nwords <- 5000
+Activations$stage <- as.factor(Activations$stage)
+Activations$word <- as.factor(Activations$word)
 
 save(Activations,file="../UntrackedData/ActivationsAllEpochsS1.Rdata")
 
