@@ -1,6 +1,8 @@
-setwd('AAE/UntrackedData/')
-load('ActivationsAllEpochsS1.Rdata',verbose=T)
-load('../Simple_SP_2014/Targets.Rdata',verbose=T)
+setwd('~/AAE/')
+load('UntrackedData/ActivationsAllEpochsS1.Rdata',verbose=T)
+load('UntrackedData/Targets.Rdata',verbose=T)
+source('accCosineDistance.R')
+source('sub2ind.R')
 
 phon <- rep(FALSE, 450); phon[1:250] <- TRUE
 sem <- rep(FALSE, 450); sem[251:450] <- TRUE
