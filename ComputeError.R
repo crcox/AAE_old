@@ -11,8 +11,9 @@ x <- matrix(0,3,2)
 
 n <- length(unique(Activations$epoch))
 lang <- c("AAE","SAE")
-Accuracy <- data.frame(matrix(ncol=6,nrow=n*500*2))
-names(Accuracy) <- c("lang","epoch","word","all","phon","sem")
+# Accuracy <- data.frame(matrix(ncol=6,nrow=n*500*2))
+# names(Accuracy) <- c("lang","epoch","word","all","phon","sem")
+load('UntrackedData/Accuracy.Rdata')
 
 counter = 0
 for (j in seq(1:2)) {
@@ -20,10 +21,10 @@ for (j in seq(1:2)) {
   TT <- TT[Targets$lang == lang[j],]
   for (i in seq(1:n)) {
     counter <- counter + 1
-    txtProgressBar(0,n*2,value=counter)
+    txtProgressBar(0,n*2,initial=counter,width=80,style=3)
     a <- sub2ind(c(500,n,2),1,i,j)
     b <- (a-1) + 500
-    
+    if (!is.na(Accuracy$epoch[a])) {next}
     AA <- subset(Activations,
                 Activations$lang==lang[j] &
                 Activations$epoch==(i * 10)
@@ -37,6 +38,7 @@ for (j in seq(1:2)) {
     Accuracy$sem[a:b] <- accCosineDistance(AA[,sem],TT[,sem])
   }
 }
+Accuracy <- Accuracy[!is.na(Accuracy$epoch), ]
 save(Accuracy,file="UntrackedData/Accuracy.Rdata")
 
 # 
