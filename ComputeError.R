@@ -1,6 +1,6 @@
 setwd('~/AAE/')
 load('UntrackedData/ActivationsAllEpochsS1.Rdata',verbose=T)
-load('UntrackedData/Targets.Rdata',verbose=T)
+load('Simple_SP_2014//Targets.Rdata',verbose=T)
 source('accCosineDistance.R')
 source('sub2ind.R')
 
@@ -8,16 +8,20 @@ phon <- rep(FALSE, 450); phon[1:250] <- TRUE
 sem <- rep(FALSE, 450); sem[251:450] <- TRUE
 x <- matrix(0,3,2)
 
-Accuracy <- data.frame(matrix(ncol=6,nrow=dim(Activations)[1]))
-names(Accuracy) <- c("lang","epoch","word","all","phon","sem")
+
 n <- length(unique(Activations$epoch))
 lang <- c("AAE","SAE")
+Accuracy <- data.frame(matrix(ncol=6,nrow=n*500*2))
+names(Accuracy) <- c("lang","epoch","word","all","phon","sem")
 
+counter = 0
 for (j in seq(1:2)) {
   TT <- as.matrix(Targets[,3:452])
   TT <- TT[Targets$lang == lang[j],]
   for (i in seq(1:n)) {
-    a <- sub2ind(c(n,2),i,j)
+    counter <- counter + 1
+    txtProgressBar(0,n*2,value=counter)
+    a <- sub2ind(c(500,n,2),1,i,j)
     b <- (a-1) + 500
     
     AA <- subset(Activations,
@@ -27,13 +31,14 @@ for (j in seq(1:2)) {
     AA <- as.matrix(AA[,9:458])
 
     Accuracy$lang[a:b] <- lang[j]
-    Accuracy$epoch[a:b] <- ((i-1) * 10)
-    Accuracy$all <- accCosineDistance(AA,TT)
-    Accuracy$phon <- accCosineDistance(AA[,phon],TT[,phon])
-    Accuracy$sem <- accCosineDistance(AA[,sem],TT[,sem])
+    Accuracy$epoch[a:b] <- (i * 10)
+    Accuracy$all[a:b] <- accCosineDistance(AA,TT)
+    Accuracy$phon[a:b] <- accCosineDistance(AA[,phon],TT[,phon])
+    Accuracy$sem[a:b] <- accCosineDistance(AA[,sem],TT[,sem])
   }
 }
-   
+save(Accuracy,file="UntrackedData/Accuracy.Rdata")
+
 # 
 # x[1,1] <- mean(apply(COS,2,which.max) == seq(1:500))
 # 

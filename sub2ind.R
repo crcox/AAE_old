@@ -31,6 +31,6 @@ sub2ind <-function(siz,...) {
   #Compute linear indices
   k = c(1, cumprod(siz[1:length(siz)-1]))
   
-  return(as.numeric(1 + matrix(k,ncol=d) %*% t(matrix((m-1),ncol=2))))
+  return(as.numeric(1 + matrix(k,ncol=d) %*% t(matrix((m-1),ncol=d))))
   
 }
